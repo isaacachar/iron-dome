@@ -1607,10 +1607,18 @@ function gameLoop(currentTime) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // DEBUG: Draw a test rectangle to verify canvas works
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(10, 10, 50, 50);
+
     // Center and scale the view
     ctx.save();
     ctx.translate(gameOffsetX, gameOffsetY);
     ctx.scale(gameScale, gameScale);
+
+    // DEBUG: Draw at origin to verify transform
+    ctx.fillStyle = '#00ff00';
+    ctx.fillRect(-25, -25, 50, 50);
 
     drawCore();
 

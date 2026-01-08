@@ -43,7 +43,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         #gameCanvas {
@@ -60,9 +59,9 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
+        /* Top Bar - Stats */
         #topBar {
             position: absolute;
             top: max(8px, env(safe-area-inset-top));
@@ -72,79 +71,110 @@
             justify-content: space-between;
             align-items: center;
             color: #e8f0ff;
-            font-size: clamp(12px, 3.5vw, 16px);
+            font-size: clamp(13px, 3.5vw, 16px);
             font-weight: 600;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
             pointer-events: none;
         }
 
-        #topBar span {
-            background: rgba(10, 12, 16, 0.7);
-            padding: 6px 10px;
-            border-radius: 6px;
+        .statBox {
+            background: rgba(10, 12, 16, 0.85);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(64, 128, 192, 0.3);
         }
 
-        #topRight {
+        #moneyLabel {
+            color: #5cff5c;
+        }
+
+        #waveLabel.boss {
+            color: #ff50c8 !important;
+        }
+
+        #waveLabel.swarm {
+            color: #ffc832 !important;
+        }
+
+        /* Top corners - small controls */
+        #topLeft {
             position: absolute;
-            top: max(50px, calc(env(safe-area-inset-top) + 40px));
-            right: 8px;
+            top: max(50px, calc(env(safe-area-inset-top) + 45px));
+            left: 8px;
             display: flex;
-            flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             pointer-events: auto;
         }
 
-        .btn {
-            background: rgba(25, 40, 65, 0.95);
-            border: 2px solid #4080c0;
-            color: #e8f0ff;
-            padding: 14px 18px;
-            border-radius: 10px;
-            font-size: clamp(12px, 3.5vw, 14px);
-            font-weight: 600;
-            cursor: pointer;
-            min-height: 48px;
-            min-width: 48px;
+        #topRightControls {
+            position: absolute;
+            top: max(50px, calc(env(safe-area-inset-top) + 45px));
+            right: 8px;
+            display: flex;
+            gap: 6px;
+            pointer-events: auto;
+        }
+
+        .smallBtn {
+            background: rgba(20, 30, 50, 0.9);
+            border: 1px solid rgba(64, 128, 192, 0.5);
+            color: #a0b8d0;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
 
-        .btn:active {
-            background: rgba(60, 100, 160, 0.95);
-            transform: scale(0.95);
+        .smallBtn:active {
+            background: rgba(60, 100, 160, 0.9);
+            transform: scale(0.92);
         }
 
-        .btn:disabled {
-            background: rgba(15, 20, 30, 0.8);
-            border-color: #303848;
-            color: #505868;
+        .smallBtn.muted {
+            color: #404858;
+            border-color: rgba(64, 128, 192, 0.2);
         }
 
-        #abilityBar {
+        /* Bottom area - Main controls */
+        #bottomArea {
             position: absolute;
-            bottom: max(16px, env(safe-area-inset-bottom));
+            bottom: max(12px, env(safe-area-inset-bottom));
             left: 8px;
             right: 8px;
             display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        /* Ability bar */
+        #abilityBar {
+            display: flex;
             justify-content: center;
             gap: 8px;
-            pointer-events: auto;
         }
 
         .abilityBtn {
             background: rgba(25, 40, 65, 0.95);
             border: 2px solid #4080c0;
             color: #e8f0ff;
-            padding: 14px 12px;
-            border-radius: 10px;
-            font-size: clamp(11px, 3vw, 13px);
+            padding: 12px 8px;
+            border-radius: 12px;
+            font-size: clamp(11px, 2.8vw, 13px);
             font-weight: 600;
-            min-height: 52px;
-            min-width: 80px;
+            min-height: 56px;
             flex: 1;
-            max-width: 120px;
+            max-width: 110px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
         }
 
         .abilityBtn:active {
@@ -164,33 +194,60 @@
             background: rgba(40, 80, 60, 0.95);
         }
 
-        .audioRow {
-            display: flex;
-            gap: 8px;
+        .abilityBtn .count {
+            font-size: 10px;
+            opacity: 0.7;
         }
 
-        .audioBtn {
+        /* Main action row */
+        #actionRow {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #startWaveBtn {
+            background: linear-gradient(180deg, rgba(40, 80, 130, 0.95) 0%, rgba(25, 50, 90, 0.95) 100%);
+            border: 2px solid #5090d0;
+            color: #ffffff;
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: clamp(14px, 4vw, 18px);
+            font-weight: 700;
+            min-height: 58px;
+            min-width: 160px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(64, 128, 200, 0.3);
+        }
+
+        #startWaveBtn:active {
+            background: linear-gradient(180deg, rgba(60, 110, 170, 0.95) 0%, rgba(40, 70, 120, 0.95) 100%);
+            transform: scale(0.96);
+        }
+
+        #startWaveBtn:disabled {
+            background: rgba(20, 30, 45, 0.9);
+            border-color: #354050;
+            color: #607080;
+            box-shadow: none;
+        }
+
+        #speedBtn {
             background: rgba(25, 40, 65, 0.95);
             border: 2px solid #4080c0;
             color: #e8f0ff;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 18px;
-            min-height: 48px;
-            min-width: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: clamp(14px, 4vw, 18px);
+            font-weight: 700;
+            min-height: 58px;
+            min-width: 65px;
         }
 
-        .audioBtn:active {
+        #speedBtn:active {
             background: rgba(60, 100, 160, 0.95);
-            transform: scale(0.95);
-        }
-
-        .audioBtn.muted {
-            color: #505868;
-            border-color: #303848;
+            transform: scale(0.96);
         }
 
         /* Panels */
@@ -199,116 +256,252 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(12, 16, 24, 0.98);
-            border: 2px solid #405880;
-            border-radius: 16px;
+            background: rgba(10, 14, 22, 0.98);
+            border: 2px solid #3a5070;
+            border-radius: 20px;
             padding: 20px;
-            width: calc(100% - 32px);
-            max-width: 340px;
-            max-height: calc(100% - 120px);
+            width: calc(100% - 24px);
+            max-width: 360px;
+            max-height: calc(100% - 100px);
             overflow-y: auto;
             pointer-events: auto;
             display: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
         }
 
-        #upgradePanel h2 {
-            color: #e8f0ff;
-            text-align: center;
+        /* Upgrade Panel */
+        #upgradePanel {
+            padding: 18px;
+        }
+
+        .panelHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 16px;
-            font-size: clamp(18px, 5vw, 22px);
+            padding-bottom: 12px;
+            border-bottom: 1px solid #2a3a50;
         }
 
-        .upgradeRow {
-            margin-bottom: 10px;
+        .panelHeader h2 {
+            color: #e8f0ff;
+            font-size: clamp(18px, 5vw, 22px);
+            margin: 0;
+        }
+
+        .panelMoney {
+            color: #5cff5c;
+            font-size: clamp(16px, 4vw, 20px);
+            font-weight: 700;
+        }
+
+        .upgradeSection {
+            margin-bottom: 16px;
+        }
+
+        .sectionLabel {
+            color: #6080a0;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .upgradeGrid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .upgradeBtn {
-            width: 100%;
-            background: rgba(25, 40, 65, 0.95);
-            border: 2px solid #4080c0;
+            display: flex;
+            align-items: center;
+            background: rgba(25, 40, 65, 0.9);
+            border: 2px solid #3a5a80;
             color: #e8f0ff;
-            padding: 14px 12px;
-            border-radius: 10px;
+            padding: 12px 14px;
+            border-radius: 12px;
             font-size: clamp(13px, 3.5vw, 15px);
             font-weight: 500;
+            min-height: 60px;
             text-align: left;
-            min-height: 48px;
+            transition: border-color 0.15s;
         }
 
         .upgradeBtn:active {
-            background: rgba(60, 100, 160, 0.95);
+            background: rgba(50, 80, 120, 0.9);
             transform: scale(0.98);
         }
 
         .upgradeBtn:disabled {
-            background: rgba(15, 20, 30, 0.8);
-            border-color: #303848;
+            background: rgba(15, 20, 30, 0.7);
+            border-color: #252535;
             color: #505868;
         }
 
-        .upgradeInfo {
-            color: #7088a8;
-            font-size: 11px;
-            text-align: center;
-            margin-top: 3px;
+        .upgradeBtn.affordable {
+            border-color: #5cff5c;
         }
 
-        .sectionTitle {
-            color: #7088a8;
-            font-size: 12px;
-            text-align: center;
-            margin: 14px 0 10px 0;
-            border-top: 1px solid #303848;
-            padding-top: 14px;
-        }
-
-        .abilityRow {
+        .upgradeIcon {
+            width: 36px;
+            height: 36px;
+            background: rgba(64, 128, 192, 0.2);
+            border-radius: 8px;
             display: flex;
-            gap: 6px;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 12px;
+            flex-shrink: 0;
         }
 
-        .abilityRow .upgradeBtn {
+        .upgradeContent {
             flex: 1;
+            min-width: 0;
+        }
+
+        .upgradeName {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .upgradeStats {
+            font-size: 11px;
+            color: #7090b0;
+        }
+
+        .upgradeLevel {
+            font-size: 10px;
+            color: #5080a0;
+            margin-top: 2px;
+        }
+
+        .upgradeCost {
+            font-weight: 700;
+            color: #5cff5c;
+            font-size: clamp(13px, 3.5vw, 15px);
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .upgradeBtn:disabled .upgradeCost {
+            color: #505868;
+        }
+
+        /* Ability purchase row */
+        .abilityPurchaseRow {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .abilityPurchaseBtn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(25, 40, 65, 0.9);
+            border: 2px solid #3a5a80;
+            color: #e8f0ff;
+            padding: 12px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            min-height: 70px;
             text-align: center;
-            padding: 12px 6px;
-            font-size: clamp(11px, 3vw, 13px);
+        }
+
+        .abilityPurchaseBtn:active {
+            background: rgba(50, 80, 120, 0.9);
+            transform: scale(0.96);
+        }
+
+        .abilityPurchaseBtn:disabled {
+            background: rgba(15, 20, 30, 0.7);
+            border-color: #252535;
+            color: #505868;
+        }
+
+        .abilityPurchaseBtn.affordable {
+            border-color: #5cff5c;
+        }
+
+        .abilityPurchaseBtn .icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .abilityPurchaseBtn .cost {
+            color: #5cff5c;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .abilityPurchaseBtn:disabled .cost {
+            color: #505868;
         }
 
         #closeBtn {
-            margin-top: 14px;
+            margin-top: 16px;
             width: 100%;
+            background: rgba(40, 50, 70, 0.9);
+            border: 2px solid #4a6080;
+            color: #c0d0e0;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
         }
 
+        #closeBtn:active {
+            background: rgba(60, 80, 110, 0.9);
+            transform: scale(0.98);
+        }
+
+        /* Game Over Panel */
         #gameOverPanel {
             text-align: center;
-            padding: 24px 20px;
+            padding: 28px 24px;
         }
 
         #gameOverText {
-            font-size: clamp(22px, 6vw, 28px);
+            font-size: clamp(24px, 7vw, 32px);
             font-weight: 700;
             color: #ff5050;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+        }
+
+        #gameOverText.newHighScore {
+            color: #ffd700;
         }
 
         #gameOverStats {
             color: #8090a8;
-            font-size: clamp(13px, 3.5vw, 15px);
-            margin-bottom: 20px;
-            line-height: 1.8;
+            font-size: clamp(14px, 3.5vw, 16px);
+            margin-bottom: 24px;
+            line-height: 1.9;
         }
 
-        #gameOverStats div:nth-child(2) {
+        #gameOverStats .highlight {
             color: #ffcc00;
             font-weight: 600;
         }
 
-        #waveLabel.boss {
-            color: #ff50c8 !important;
+        #restartBtn {
+            background: linear-gradient(180deg, rgba(40, 80, 130, 0.95) 0%, rgba(25, 50, 90, 0.95) 100%);
+            border: 2px solid #5090d0;
+            color: #ffffff;
+            padding: 16px 40px;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(64, 128, 200, 0.3);
         }
 
-        #waveLabel.swarm {
-            color: #ffc832 !important;
+        #restartBtn:active {
+            background: linear-gradient(180deg, rgba(60, 110, 170, 0.95) 0%, rgba(40, 70, 120, 0.95) 100%);
+            transform: scale(0.96);
         }
 
         /* Prevent pull-to-refresh */
@@ -321,66 +514,136 @@
     <div id="gameContainer">
         <canvas id="gameCanvas"></canvas>
         <div id="ui">
+            <!-- Top Stats Bar -->
             <div id="topBar">
-                <span id="moneyLabel">$0</span>
-                <span id="waveLabel">Wave 0</span>
-                <span id="highScoreLabel">Best: 0</span>
+                <span class="statBox" id="moneyLabel">$0</span>
+                <span class="statBox" id="waveLabel">Wave 0</span>
+                <span class="statBox" id="highScoreLabel">Best: 0</span>
             </div>
-            <div id="topRight">
-                <button class="btn" id="startWaveBtn">START</button>
-                <button class="btn" id="speedBtn">1x</button>
-                <div class="audioRow">
-                    <button class="audioBtn" id="musicBtn">&#9835;</button>
-                    <button class="audioBtn" id="sfxBtn">&#128266;</button>
+
+            <!-- Top Left - Speed Control -->
+            <div id="topLeft">
+            </div>
+
+            <!-- Top Right - Audio Controls -->
+            <div id="topRightControls">
+                <button class="smallBtn" id="musicBtn">&#9835;</button>
+                <button class="smallBtn" id="sfxBtn">&#128266;</button>
+            </div>
+
+            <!-- Bottom Area -->
+            <div id="bottomArea">
+                <!-- Ability Buttons -->
+                <div id="abilityBar">
+                    <button class="abilityBtn" id="pierceBtn" disabled>
+                        <span>PIERCE</span>
+                        <span class="count">[0]</span>
+                    </button>
+                    <button class="abilityBtn" id="frostBtn" disabled>
+                        <span>FROST</span>
+                        <span class="count">[0]</span>
+                    </button>
+                    <button class="abilityBtn" id="critBtn" disabled>
+                        <span>CRIT</span>
+                        <span class="count">[0]</span>
+                    </button>
+                </div>
+
+                <!-- Main Action Row -->
+                <div id="actionRow">
+                    <button id="startWaveBtn">START</button>
+                    <button id="speedBtn">1x</button>
                 </div>
             </div>
-            <div id="abilityBar">
-                <button class="abilityBtn" id="pierceBtn" disabled>PIERCE [0]</button>
-                <button class="abilityBtn" id="frostBtn" disabled>FROST [0]</button>
-                <button class="abilityBtn" id="critBtn" disabled>CRIT [0]</button>
-            </div>
+
+            <!-- Upgrade Panel -->
             <div id="upgradePanel" class="panel">
-                <h2>UPGRADES</h2>
-                <div class="upgradeRow">
-                    <button class="upgradeBtn" id="damageBtn">Damage +10 [$50]</button>
-                    <div class="upgradeInfo" id="damageInfo">Current: 35 dmg</div>
+                <div class="panelHeader">
+                    <h2>UPGRADES</h2>
+                    <span class="panelMoney" id="panelMoneyLabel">$0</span>
                 </div>
-                <div class="upgradeRow">
-                    <button class="upgradeBtn" id="fireRateBtn">Fire Rate +0.5 [$75]</button>
-                    <div class="upgradeInfo" id="fireRateInfo">Current: 3.0/s</div>
+
+                <div class="upgradeSection">
+                    <div class="sectionLabel">Tower Stats</div>
+                    <div class="upgradeGrid">
+                        <button class="upgradeBtn" id="damageBtn">
+                            <div class="upgradeIcon">&#9876;</div>
+                            <div class="upgradeContent">
+                                <div class="upgradeName">Damage</div>
+                                <div class="upgradeStats" id="damageInfo">35 dmg</div>
+                                <div class="upgradeLevel" id="damageLevel">Level 1</div>
+                            </div>
+                            <div class="upgradeCost" id="damageCost">$50</div>
+                        </button>
+                        <button class="upgradeBtn" id="fireRateBtn">
+                            <div class="upgradeIcon">&#9889;</div>
+                            <div class="upgradeContent">
+                                <div class="upgradeName">Fire Rate</div>
+                                <div class="upgradeStats" id="fireRateInfo">3.0/s</div>
+                                <div class="upgradeLevel" id="fireRateLevel">Level 1</div>
+                            </div>
+                            <div class="upgradeCost" id="fireRateCost">$75</div>
+                        </button>
+                        <button class="upgradeBtn" id="rangeBtn">
+                            <div class="upgradeIcon">&#9678;</div>
+                            <div class="upgradeContent">
+                                <div class="upgradeName">Range</div>
+                                <div class="upgradeStats" id="rangeInfo">225</div>
+                                <div class="upgradeLevel" id="rangeLevel">Level 1</div>
+                            </div>
+                            <div class="upgradeCost" id="rangeCost">$60</div>
+                        </button>
+                        <button class="upgradeBtn" id="multishotBtn">
+                            <div class="upgradeIcon">&#10070;</div>
+                            <div class="upgradeContent">
+                                <div class="upgradeName">Multi-shot</div>
+                                <div class="upgradeStats" id="multishotInfo">1 projectile</div>
+                                <div class="upgradeLevel" id="multishotLevel">Level 1</div>
+                            </div>
+                            <div class="upgradeCost" id="multishotCost">$250</div>
+                        </button>
+                    </div>
                 </div>
-                <div class="upgradeRow">
-                    <button class="upgradeBtn" id="rangeBtn">Range +50 [$60]</button>
-                    <div class="upgradeInfo" id="rangeInfo">Current: 450</div>
+
+                <div class="upgradeSection">
+                    <div class="sectionLabel">Abilities (consumable)</div>
+                    <div class="abilityPurchaseRow">
+                        <button class="abilityPurchaseBtn" id="buyPierceBtn">
+                            <span class="icon">&#8596;</span>
+                            <span>Pierce</span>
+                            <span class="cost">$50</span>
+                        </button>
+                        <button class="abilityPurchaseBtn" id="buyFrostBtn">
+                            <span class="icon">&#10052;</span>
+                            <span>Frost</span>
+                            <span class="cost">$40</span>
+                        </button>
+                        <button class="abilityPurchaseBtn" id="buyCritBtn">
+                            <span class="icon">&#9733;</span>
+                            <span>Crit</span>
+                            <span class="cost">$60</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="upgradeRow">
-                    <button class="upgradeBtn" id="multishotBtn">Multi-shot +1 [$250]</button>
-                    <div class="upgradeInfo" id="multishotInfo">Current: 1 projectile</div>
-                </div>
-                <div class="sectionTitle">ABILITIES (consumable)</div>
-                <div class="abilityRow">
-                    <button class="upgradeBtn" id="buyPierceBtn">Pierce [$50]</button>
-                    <button class="upgradeBtn" id="buyFrostBtn">Frost [$40]</button>
-                    <button class="upgradeBtn" id="buyCritBtn">Crit [$60]</button>
-                </div>
-                <button class="btn" id="closeBtn">Close</button>
+
+                <button id="closeBtn">Continue</button>
             </div>
+
+            <!-- Game Over Panel -->
             <div id="gameOverPanel" class="panel">
                 <div id="gameOverText">CORE DESTROYED</div>
                 <div id="gameOverStats"></div>
-                <button class="btn" id="restartBtn">Play Again</button>
+                <button id="restartBtn">Play Again</button>
             </div>
         </div>
     </div>
     <script src="game.js"></script>
     <script>
         // DISABLED: Service Worker causing cache issues
-        // Unregister any existing service workers
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for(let registration of registrations) {
                     registration.unregister();
-                    console.log('SW unregistered');
                 }
             });
         }

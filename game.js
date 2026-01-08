@@ -1418,16 +1418,22 @@ function updateUI() {
 
 function updateAbilityButton(id, active, timer, charges, name) {
     const btn = document.getElementById(id);
+    const countSpan = btn.querySelector('.count');
+    const nameSpan = btn.querySelector('span:not(.count)');
+
     if (active) {
-        btn.textContent = `${name} [${timer.toFixed(1)}s]`;
+        if (nameSpan) nameSpan.textContent = name;
+        if (countSpan) countSpan.textContent = `[${timer.toFixed(1)}s]`;
         btn.disabled = true;
         btn.classList.add('active');
     } else if (charges > 0) {
-        btn.textContent = `${name} [${charges}]`;
+        if (nameSpan) nameSpan.textContent = name;
+        if (countSpan) countSpan.textContent = `[${charges}]`;
         btn.disabled = false;
         btn.classList.remove('active');
     } else {
-        btn.textContent = `${name} [0]`;
+        if (nameSpan) nameSpan.textContent = name;
+        if (countSpan) countSpan.textContent = '[0]';
         btn.disabled = true;
         btn.classList.remove('active');
     }
@@ -1448,31 +1454,64 @@ function updateWaveLabel() {
     }
 }
 
+// Track upgrade levels
+const upgradeLevels = {
+    damage: 1,
+    fireRate: 1,
+    range: 1,
+    multishot: 1
+};
+
 function updateUpgradePanel() {
-    document.getElementById('damageBtn').textContent = `Damage +10 [$${game.damageCost}]`;
-    document.getElementById('damageInfo').textContent = `Current: ${core.damage} dmg`;
-    document.getElementById('damageBtn').disabled = game.money < game.damageCost;
+    // Update panel money display
+    const panelMoney = document.getElementById('panelMoneyLabel');
+    if (panelMoney) panelMoney.textContent = `$${game.money}`;
 
-    document.getElementById('fireRateBtn').textContent = `Fire Rate +0.5 [$${game.fireRateCost}]`;
-    document.getElementById('fireRateInfo').textContent = `Current: ${core.fireRate.toFixed(1)}/s`;
-    document.getElementById('fireRateBtn').disabled = game.money < game.fireRateCost;
+    // Damage upgrade
+    const damageBtn = document.getElementById('damageBtn');
+    document.getElementById('damageInfo').textContent = `${core.damage} dmg`;
+    document.getElementById('damageCost').textContent = `$${game.damageCost}`;
+    document.getElementById('damageLevel').textContent = `Level ${upgradeLevels.damage}`;
+    damageBtn.disabled = game.money < game.damageCost;
+    damageBtn.classList.toggle('affordable', game.money >= game.damageCost);
 
-    document.getElementById('rangeBtn').textContent = `Range +50 [$${game.rangeCost}]`;
-    document.getElementById('rangeInfo').textContent = `Current: ${Math.floor(core.attackRange * 2)}`; // Display scaled
-    document.getElementById('rangeBtn').disabled = game.money < game.rangeCost;
+    // Fire rate upgrade
+    const fireRateBtn = document.getElementById('fireRateBtn');
+    document.getElementById('fireRateInfo').textContent = `${core.fireRate.toFixed(1)}/s`;
+    document.getElementById('fireRateCost').textContent = `$${game.fireRateCost}`;
+    document.getElementById('fireRateLevel').textContent = `Level ${upgradeLevels.fireRate}`;
+    fireRateBtn.disabled = game.money < game.fireRateCost;
+    fireRateBtn.classList.toggle('affordable', game.money >= game.fireRateCost);
 
-    document.getElementById('multishotBtn').textContent = `Multi-shot +1 [$${game.multishotCost}]`;
-    document.getElementById('multishotInfo').textContent = `Current: ${core.projectileCount} projectile${core.projectileCount > 1 ? 's' : ''}`;
-    document.getElementById('multishotBtn').disabled = game.money < game.multishotCost || core.projectileCount >= 5;
+    // Range upgrade
+    const rangeBtn = document.getElementById('rangeBtn');
+    document.getElementById('rangeInfo').textContent = `${Math.floor(core.attackRange)}`;
+    document.getElementById('rangeCost').textContent = `$${game.rangeCost}`;
+    document.getElementById('rangeLevel').textContent = `Level ${upgradeLevels.range}`;
+    rangeBtn.disabled = game.money < game.rangeCost;
+    rangeBtn.classList.toggle('affordable', game.money >= game.rangeCost);
 
-    document.getElementById('buyPierceBtn').textContent = `+1 Pierce [$${game.pierceCost}]`;
-    document.getElementById('buyPierceBtn').disabled = game.money < game.pierceCost;
+    // Multishot upgrade
+    const multishotBtn = document.getElementById('multishotBtn');
+    document.getElementById('multishotInfo').textContent = `${core.projectileCount} projectile${core.projectileCount > 1 ? 's' : ''}`;
+    document.getElementById('multishotCost').textContent = `$${game.multishotCost}`;
+    document.getElementById('multishotLevel').textContent = `Level ${upgradeLevels.multishot}`;
+    const canBuyMultishot = game.money >= game.multishotCost && core.projectileCount < 5;
+    multishotBtn.disabled = !canBuyMultishot;
+    multishotBtn.classList.toggle('affordable', canBuyMultishot);
 
-    document.getElementById('buyFrostBtn').textContent = `+1 Frost [$${game.frostCost}]`;
-    document.getElementById('buyFrostBtn').disabled = game.money < game.frostCost;
+    // Ability purchase buttons
+    const pierceBtn = document.getElementById('buyPierceBtn');
+    pierceBtn.disabled = game.money < game.pierceCost;
+    pierceBtn.classList.toggle('affordable', game.money >= game.pierceCost);
 
-    document.getElementById('buyCritBtn').textContent = `+1 Crit [$${game.critCost}]`;
-    document.getElementById('buyCritBtn').disabled = game.money < game.critCost;
+    const frostBtn = document.getElementById('buyFrostBtn');
+    frostBtn.disabled = game.money < game.frostCost;
+    frostBtn.classList.toggle('affordable', game.money >= game.frostCost);
+
+    const critBtn = document.getElementById('buyCritBtn');
+    critBtn.disabled = game.money < game.critCost;
+    critBtn.classList.toggle('affordable', game.money >= game.critCost);
 }
 
 function showUpgradePanel() {
@@ -1692,6 +1731,7 @@ document.getElementById('damageBtn').addEventListener('click', () => {
         game.money -= game.damageCost;
         core.damage += 10;
         game.damageCost = Math.floor(game.damageCost * 1.8);
+        upgradeLevels.damage++;
         updateUpgradePanel();
     }
 });
@@ -1702,6 +1742,7 @@ document.getElementById('fireRateBtn').addEventListener('click', () => {
         game.money -= game.fireRateCost;
         core.fireRate += 0.5;
         game.fireRateCost = Math.floor(game.fireRateCost * 2);
+        upgradeLevels.fireRate++;
         updateUpgradePanel();
     }
 });
@@ -1710,8 +1751,9 @@ document.getElementById('rangeBtn').addEventListener('click', () => {
     if (game.money >= game.rangeCost) {
         AudioManager.playUpgrade();
         game.money -= game.rangeCost;
-        core.attackRange += 25; // Scaled for canvas
+        core.attackRange += 25;
         game.rangeCost = Math.floor(game.rangeCost * 1.6);
+        upgradeLevels.range++;
         updateUpgradePanel();
     }
 });
@@ -1722,6 +1764,7 @@ document.getElementById('multishotBtn').addEventListener('click', () => {
         game.money -= game.multishotCost;
         core.projectileCount++;
         game.multishotCost = Math.floor(game.multishotCost * 2.5);
+        upgradeLevels.multishot++;
         updateUpgradePanel();
     }
 });
@@ -1806,6 +1849,12 @@ document.getElementById('restartBtn').addEventListener('click', () => {
     game.pierceCost = 50;
     game.frostCost = 40;
     game.critCost = 60;
+
+    // Reset upgrade levels
+    upgradeLevels.damage = 1;
+    upgradeLevels.fireRate = 1;
+    upgradeLevels.range = 1;
+    upgradeLevels.multishot = 1;
 
     // Reset core
     core.damage = 35;

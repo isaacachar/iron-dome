@@ -1115,7 +1115,7 @@ function startWave(waveNum) {
     }
 
     game.enemiesToSpawn = count;
-    spawnTimer = 0;
+    spawnTimer = spawnDelay; // Spawn first enemy immediately
 
     updateWaveLabel();
 }
@@ -1651,13 +1651,18 @@ document.addEventListener('touchstart', initAudioOnInteraction, { once: true });
 document.addEventListener('touchend', initAudioOnInteraction, { once: true });
 document.addEventListener('click', initAudioOnInteraction, { once: true });
 
-document.getElementById('startWaveBtn').addEventListener('click', () => {
+function handleStartWave() {
     if (!game.waveInProgress && game.enemiesAlive === 0) {
         AudioManager.playClick();
         game.countdownActive = false;
         hideUpgradePanel();
         startWave(game.currentWave + 1);
     }
+}
+document.getElementById('startWaveBtn').addEventListener('click', handleStartWave);
+document.getElementById('startWaveBtn').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    handleStartWave();
 });
 
 document.getElementById('speedBtn').addEventListener('click', () => {

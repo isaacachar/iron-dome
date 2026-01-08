@@ -1600,6 +1600,16 @@ function gameLoop(currentTime) {
     ctx.fillStyle = '#ff0000';
     ctx.fillRect(10, 10, 50, 50);
 
+    // DEBUG: Show game state
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '12px monospace';
+    ctx.fillText(`waveInProgress: ${game.waveInProgress}`, 10, 80);
+    ctx.fillText(`enemiesToSpawn: ${game.enemiesToSpawn}`, 10, 95);
+    ctx.fillText(`enemiesAlive: ${game.enemiesAlive}`, 10, 110);
+    ctx.fillText(`enemies.length: ${enemies.length}`, 10, 125);
+    ctx.fillText(`spawnTimer: ${spawnTimer.toFixed(2)}`, 10, 140);
+    ctx.fillText(`spawnDelay: ${spawnDelay}`, 10, 155);
+
     // Center and scale the view
     ctx.save();
     ctx.translate(gameOffsetX, gameOffsetY);

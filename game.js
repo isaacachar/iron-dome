@@ -1081,6 +1081,7 @@ let isBossWave = false;
 let isSwarmWave = false;
 
 function startWave(waveNum) {
+    console.log('startWave called with wave:', waveNum);
     game.currentWave = waveNum;
     game.waveInProgress = true;
 
@@ -1095,6 +1096,8 @@ function startWave(waveNum) {
     }
 
     let count = getEnemyCount(waveNum);
+    console.log('Enemy count for wave', waveNum, ':', count);
+
     if (isSwarmWave) {
         count *= 3;
         spawnDelay = 0.15;
@@ -1107,6 +1110,9 @@ function startWave(waveNum) {
 
     game.enemiesToSpawn = count;
     spawnTimer = spawnDelay; // Spawn first enemy immediately
+
+    console.log('Set enemiesToSpawn to:', game.enemiesToSpawn);
+    console.log('Set spawnTimer to:', spawnTimer, 'spawnDelay:', spawnDelay);
 
     updateWaveLabel();
 }
@@ -1394,8 +1400,7 @@ function drawExplosions() {
 // UI UPDATES
 // ==================
 function updateUI() {
-    document.getElementById('moneyLabel').textContent = `$ ${game.money}`;
-    document.getElementById('enemiesLabel').textContent = `Enemies: ${game.enemiesAlive}`;
+    document.getElementById('moneyLabel').textContent = `$${game.money}`;
     document.getElementById('highScoreLabel').textContent = `Best: ${SaveManager.data.highScore}`;
 
     // Ability buttons
@@ -1545,8 +1550,13 @@ function gameLoop(currentTime) {
             }
         }
 
-        // Wave completion check
-        if (game.enemiesAlive <= 0 && game.enemiesToSpawn <= 0 && game.waveInProgress) {
+        // Wave completion check - only after at least one enemy has spawned
+        if (game.enemiesAlive <= 0 && game.enemiesToSpawn <= 0 && game.waveInProgress && game.currentWave > 0) {
+            // Safety: don't end wave if we never spawned anything
+            if (enemies.length === 0 && game.enemiesAlive === 0) {
+                // Something went wrong, wave never started properly
+                console.log('Wave ended without spawning enemies!');
+            }
             game.waveInProgress = false;
             SaveManager.addWaveCompleted();
         }

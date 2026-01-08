@@ -445,17 +445,15 @@ let canvasWidth = 0;
 let canvasHeight = 0;
 
 function resizeCanvas() {
-    // Use clientWidth/Height as fallback for mobile browsers
-    const width = window.innerWidth || document.documentElement.clientWidth || canvas.parentElement.clientWidth || 400;
-    const height = window.innerHeight || document.documentElement.clientHeight || canvas.parentElement.clientHeight || 700;
+    // Use multiple fallbacks to get valid dimensions
+    let width = window.innerWidth || document.documentElement.clientWidth || screen.width || 400;
+    let height = window.innerHeight || document.documentElement.clientHeight || screen.height || 700;
 
-    // Ensure we have valid dimensions
-    if (width <= 0 || height <= 0) {
-        setTimeout(resizeCanvas, 50);
-        return;
-    }
+    // Ensure minimum dimensions
+    width = Math.max(width, 300);
+    height = Math.max(height, 400);
 
-    // Set canvas to full screen (no DPR scaling for simplicity/performance)
+    // Set canvas to full screen
     canvas.width = width;
     canvas.height = height;
     canvas.style.width = width + 'px';
@@ -466,23 +464,16 @@ function resizeCanvas() {
 
     // Calculate game scale - game world fits in screen
     const minDim = Math.min(width, height);
-    gameScale = Math.max(0.1, minDim / 700); // Ensure scale is never 0
+    gameScale = Math.max(0.3, minDim / 700);
     gameOffsetX = width / 2;
     gameOffsetY = height / 2;
 }
 
-// Initial resize with delay for mobile browsers
-if (document.readyState === 'complete') {
-    resizeCanvas();
-} else {
-    window.addEventListener('load', resizeCanvas);
-}
-// Also try immediately in case DOM is ready
-setTimeout(resizeCanvas, 0);
-setTimeout(resizeCanvas, 100);
-
+// Resize immediately and on events
+resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 100));
+document.addEventListener('DOMContentLoaded', resizeCanvas);
 
 // Game Constants - scaled for game world
 const SPAWN_RADIUS = 280;
@@ -1596,14 +1587,12 @@ function gameLoop(currentTime) {
         updateDamageNumbers(dt);
     }
 
-    // Draw - ensure canvas is ready
+    // Ensure canvas is sized (will always have valid dimensions now)
     if (canvasWidth <= 0 || canvasHeight <= 0) {
         resizeCanvas();
-        requestAnimationFrame(gameLoop);
-        return;
     }
 
-    // Reset transform to identity before clearing (fixes mobile Safari issues)
+    // Reset transform and clear canvas
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 

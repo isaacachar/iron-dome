@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Core Defender</title>
 
     <!-- PWA Meta Tags -->
     <meta name="description" content="Defend your core against endless waves of enemies">
-    <meta name="theme-color" content="#4080c0">
+    <meta name="theme-color" content="#0a0c10">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Core Defender">
@@ -19,226 +19,288 @@
             padding: 0;
             box-sizing: border-box;
             touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            background: #0a0c10;
+        html, body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: fixed;
+            background: #0a0c10;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
         }
 
         #gameContainer {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         #gameCanvas {
             background: #0d0f14;
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         #ui {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         #topBar {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: max(8px, env(safe-area-inset-top));
+            left: 8px;
+            right: 8px;
             display: flex;
-            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
             color: #e8f0ff;
-            font-size: 18px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: clamp(12px, 3.5vw, 16px);
+            font-weight: 600;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+
+        #topBar span {
+            background: rgba(10, 12, 16, 0.7);
+            padding: 6px 10px;
+            border-radius: 6px;
         }
 
         #topRight {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: max(50px, calc(env(safe-area-inset-top) + 40px));
+            right: 8px;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 8px;
             pointer-events: auto;
         }
 
         .btn {
-            background: rgba(25, 40, 65, 0.9);
+            background: rgba(25, 40, 65, 0.95);
             border: 2px solid #4080c0;
             color: #e8f0ff;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 14px 18px;
+            border-radius: 10px;
+            font-size: clamp(12px, 3.5vw, 14px);
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn:hover {
-            background: rgba(35, 55, 85, 0.95);
-            border-color: #60a0e0;
-        }
-
-        .btn:disabled {
-            background: rgba(15, 20, 30, 0.7);
-            border-color: #303848;
-            color: #606878;
-            cursor: default;
+            min-height: 48px;
+            min-width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn:active {
+            background: rgba(60, 100, 160, 0.95);
             transform: scale(0.95);
+        }
+
+        .btn:disabled {
+            background: rgba(15, 20, 30, 0.8);
+            border-color: #303848;
+            color: #505868;
         }
 
         #abilityBar {
             position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: max(16px, env(safe-area-inset-bottom));
+            left: 8px;
+            right: 8px;
             display: flex;
-            gap: 10px;
+            justify-content: center;
+            gap: 8px;
             pointer-events: auto;
         }
 
         .abilityBtn {
-            background: rgba(25, 40, 65, 0.9);
+            background: rgba(25, 40, 65, 0.95);
             border: 2px solid #4080c0;
             color: #e8f0ff;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
+            padding: 14px 12px;
+            border-radius: 10px;
+            font-size: clamp(11px, 3vw, 13px);
+            font-weight: 600;
+            min-height: 52px;
             min-width: 80px;
+            flex: 1;
+            max-width: 120px;
             text-align: center;
         }
 
+        .abilityBtn:active {
+            background: rgba(60, 100, 160, 0.95);
+            transform: scale(0.95);
+        }
+
         .abilityBtn:disabled {
-            background: rgba(15, 20, 30, 0.7);
+            background: rgba(15, 20, 30, 0.8);
             border-color: #303848;
-            color: #606878;
+            color: #505868;
         }
 
         .abilityBtn.active {
             border-color: #80ff80;
-            box-shadow: 0 0 10px rgba(128, 255, 128, 0.5);
+            box-shadow: 0 0 15px rgba(128, 255, 128, 0.4);
+            background: rgba(40, 80, 60, 0.95);
         }
 
-        #upgradePanel {
+        .audioRow {
+            display: flex;
+            gap: 8px;
+        }
+
+        .audioBtn {
+            background: rgba(25, 40, 65, 0.95);
+            border: 2px solid #4080c0;
+            color: #e8f0ff;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 18px;
+            min-height: 48px;
+            min-width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .audioBtn:active {
+            background: rgba(60, 100, 160, 0.95);
+            transform: scale(0.95);
+        }
+
+        .audioBtn.muted {
+            color: #505868;
+            border-color: #303848;
+        }
+
+        /* Panels */
+        .panel {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(12, 16, 24, 0.95);
-            border: 3px solid #405880;
-            border-radius: 12px;
+            background: rgba(12, 16, 24, 0.98);
+            border: 2px solid #405880;
+            border-radius: 16px;
             padding: 20px;
-            min-width: 320px;
+            width: calc(100% - 32px);
+            max-width: 340px;
+            max-height: calc(100% - 120px);
+            overflow-y: auto;
             pointer-events: auto;
             display: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
 
         #upgradePanel h2 {
             color: #e8f0ff;
             text-align: center;
-            margin-bottom: 15px;
-            font-size: 22px;
+            margin-bottom: 16px;
+            font-size: clamp(18px, 5vw, 22px);
         }
 
         .upgradeRow {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .upgradeBtn {
             width: 100%;
-            background: rgba(25, 40, 65, 0.9);
+            background: rgba(25, 40, 65, 0.95);
             border: 2px solid #4080c0;
             color: #e8f0ff;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
+            padding: 14px 12px;
+            border-radius: 10px;
+            font-size: clamp(13px, 3.5vw, 15px);
+            font-weight: 500;
             text-align: left;
+            min-height: 48px;
+        }
+
+        .upgradeBtn:active {
+            background: rgba(60, 100, 160, 0.95);
+            transform: scale(0.98);
         }
 
         .upgradeBtn:disabled {
-            background: rgba(15, 20, 30, 0.7);
+            background: rgba(15, 20, 30, 0.8);
             border-color: #303848;
-            color: #606878;
+            color: #505868;
         }
 
         .upgradeInfo {
-            color: #8090a8;
-            font-size: 12px;
+            color: #7088a8;
+            font-size: 11px;
             text-align: center;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
         .sectionTitle {
-            color: #8090a8;
-            font-size: 14px;
+            color: #7088a8;
+            font-size: 12px;
             text-align: center;
-            margin: 15px 0 10px 0;
+            margin: 14px 0 10px 0;
             border-top: 1px solid #303848;
-            padding-top: 15px;
+            padding-top: 14px;
         }
 
         .abilityRow {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .abilityRow .upgradeBtn {
             flex: 1;
             text-align: center;
-            padding: 10px 8px;
-            font-size: 12px;
+            padding: 12px 6px;
+            font-size: clamp(11px, 3vw, 13px);
         }
 
         #closeBtn {
-            margin-top: 15px;
+            margin-top: 14px;
             width: 100%;
         }
 
         #gameOverPanel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(12, 16, 24, 0.95);
-            border: 3px solid #405880;
-            border-radius: 12px;
-            padding: 30px 50px;
             text-align: center;
-            pointer-events: auto;
-            display: none;
+            padding: 24px 20px;
         }
 
         #gameOverText {
-            font-size: 32px;
+            font-size: clamp(22px, 6vw, 28px);
+            font-weight: 700;
             color: #ff5050;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         #gameOverStats {
             color: #8090a8;
-            font-size: 14px;
+            font-size: clamp(13px, 3.5vw, 15px);
             margin-bottom: 20px;
-            line-height: 1.6;
+            line-height: 1.8;
         }
 
         #gameOverStats div:nth-child(2) {
             color: #ffcc00;
+            font-weight: 600;
         }
 
         #waveLabel.boss {
@@ -249,26 +311,9 @@
             color: #ffc832 !important;
         }
 
-        .audioBtn {
-            background: rgba(25, 40, 65, 0.9);
-            border: 2px solid #4080c0;
-            color: #e8f0ff;
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-width: 44px;
-        }
-
-        .audioBtn:hover {
-            background: rgba(35, 55, 85, 0.95);
-            border-color: #60a0e0;
-        }
-
-        .audioBtn.muted {
-            color: #606878;
-            border-color: #404858;
+        /* Prevent pull-to-refresh */
+        body {
+            overscroll-behavior: none;
         }
     </style>
 </head>
@@ -277,23 +322,24 @@
         <canvas id="gameCanvas"></canvas>
         <div id="ui">
             <div id="topBar">
-                <span id="moneyLabel">$ 0</span>
+                <span id="moneyLabel">$0</span>
                 <span id="waveLabel">Wave 0</span>
                 <span id="highScoreLabel">Best: 0</span>
-                <span id="enemiesLabel">Enemies: 0</span>
             </div>
             <div id="topRight">
-                <button class="btn" id="startWaveBtn">START WAVE</button>
+                <button class="btn" id="startWaveBtn">START</button>
                 <button class="btn" id="speedBtn">1x</button>
-                <button class="audioBtn" id="musicBtn" title="Toggle Music">&#9835;</button>
-                <button class="audioBtn" id="sfxBtn" title="Toggle Sound Effects">&#128266;</button>
+                <div class="audioRow">
+                    <button class="audioBtn" id="musicBtn">&#9835;</button>
+                    <button class="audioBtn" id="sfxBtn">&#128266;</button>
+                </div>
             </div>
             <div id="abilityBar">
                 <button class="abilityBtn" id="pierceBtn" disabled>PIERCE [0]</button>
                 <button class="abilityBtn" id="frostBtn" disabled>FROST [0]</button>
                 <button class="abilityBtn" id="critBtn" disabled>CRIT [0]</button>
             </div>
-            <div id="upgradePanel">
+            <div id="upgradePanel" class="panel">
                 <h2>UPGRADES</h2>
                 <div class="upgradeRow">
                     <button class="upgradeBtn" id="damageBtn">Damage +10 [$50]</button>
@@ -311,18 +357,18 @@
                     <button class="upgradeBtn" id="multishotBtn">Multi-shot +1 [$250]</button>
                     <div class="upgradeInfo" id="multishotInfo">Current: 1 projectile</div>
                 </div>
-                <div class="sectionTitle">-- ABILITIES (consumable) --</div>
+                <div class="sectionTitle">ABILITIES (consumable)</div>
                 <div class="abilityRow">
-                    <button class="upgradeBtn" id="buyPierceBtn">+1 Pierce [$50]</button>
-                    <button class="upgradeBtn" id="buyFrostBtn">+1 Frost [$40]</button>
-                    <button class="upgradeBtn" id="buyCritBtn">+1 Crit [$60]</button>
+                    <button class="upgradeBtn" id="buyPierceBtn">Pierce [$50]</button>
+                    <button class="upgradeBtn" id="buyFrostBtn">Frost [$40]</button>
+                    <button class="upgradeBtn" id="buyCritBtn">Crit [$60]</button>
                 </div>
                 <button class="btn" id="closeBtn">Close</button>
             </div>
-            <div id="gameOverPanel">
+            <div id="gameOverPanel" class="panel">
                 <div id="gameOverText">CORE DESTROYED</div>
                 <div id="gameOverStats"></div>
-                <button class="btn" id="restartBtn">Restart</button>
+                <button class="btn" id="restartBtn">Play Again</button>
             </div>
         </div>
     </div>
@@ -331,9 +377,26 @@
         // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch((err) => console.log('Service Worker registration failed:', err));
+                .then(() => console.log('SW registered'))
+                .catch(() => {});
         }
+
+        // Prevent default touch behaviors
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.tagName !== 'INPUT') {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Prevent double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>

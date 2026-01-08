@@ -85,19 +85,26 @@ const AudioManager = {
         osc2.stop(this.ctx.currentTime + 0.15);
     },
 
-    // Explosion sound
-    playExplosion() {
-        if (!this.initialized || !this.sfxEnabled) return;
-        const bufferSize = this.ctx.sampleRate * 0.3;
-        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        const data = buffer.getChannelData(0);
+    // Pre-generated explosion buffer (created once)
+    explosionBuffer: null,
 
+    createExplosionBuffer() {
+        if (!this.ctx || this.explosionBuffer) return;
+        const bufferSize = this.ctx.sampleRate * 0.3;
+        this.explosionBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = this.explosionBuffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
             data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
         }
+    },
+
+    // Explosion sound (uses pre-generated buffer)
+    playExplosion() {
+        if (!this.initialized || !this.sfxEnabled) return;
+        if (!this.explosionBuffer) this.createExplosionBuffer();
 
         const noise = this.ctx.createBufferSource();
-        noise.buffer = buffer;
+        noise.buffer = this.explosionBuffer;
 
         const filter = this.ctx.createBiquadFilter();
         filter.type = 'lowpass';
@@ -105,7 +112,7 @@ const AudioManager = {
         filter.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.3);
 
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
 
         noise.connect(filter);
@@ -430,18 +437,37 @@ const SaveManager = {
     }
 };
 
-// Responsive canvas sizing
+// Responsive canvas sizing - full screen on mobile
+let gameScale = 1;
+let gameOffsetX = 0;
+let gameOffsetY = 0;
+
 function resizeCanvas() {
-    const container = document.getElementById('gameContainer');
-    const size = Math.min(container.clientWidth, container.clientHeight, 800);
-    canvas.width = size;
-    canvas.height = size;
+    const dpr = window.devicePixelRatio || 1;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // Set canvas to full screen
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+
+    // Scale context for device pixel ratio
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Calculate game scale - game world is 800x800, fit to screen
+    const minDim = Math.min(width, height);
+    gameScale = minDim / 700; // Slight padding
+    gameOffsetX = width / 2;
+    gameOffsetY = height / 2;
 }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 100));
 
-// Game Constants
-const SPAWN_RADIUS = 300;
+// Game Constants - scaled for game world
+const SPAWN_RADIUS = 280;
 const ABILITY_DURATION = 8;
 
 // ==================
@@ -1553,11 +1579,12 @@ function gameLoop(currentTime) {
     }
 
     // Draw
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    // Center the view
+    // Center and scale the view
     ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.translate(gameOffsetX, gameOffsetY);
+    ctx.scale(gameScale, gameScale);
 
     drawCore();
 
@@ -1584,12 +1611,19 @@ function gameLoop(currentTime) {
 // EVENT LISTENERS
 // ==================
 
-// Initialize audio on first user interaction
-document.addEventListener('click', () => {
+// Initialize audio on first user interaction (works on iOS/Android)
+function initAudioOnInteraction() {
     AudioManager.init();
     AudioManager.resume();
     AudioManager.startMusic();
-}, { once: true });
+    // Remove listeners after first interaction
+    document.removeEventListener('touchstart', initAudioOnInteraction);
+    document.removeEventListener('touchend', initAudioOnInteraction);
+    document.removeEventListener('click', initAudioOnInteraction);
+}
+document.addEventListener('touchstart', initAudioOnInteraction, { once: true });
+document.addEventListener('touchend', initAudioOnInteraction, { once: true });
+document.addEventListener('click', initAudioOnInteraction, { once: true });
 
 document.getElementById('startWaveBtn').addEventListener('click', () => {
     if (!game.waveInProgress && game.enemiesAlive === 0) {

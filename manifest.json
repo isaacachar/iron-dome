@@ -1,12 +1,12 @@
 {
     "name": "Iron Dome",
     "short_name": "Iron Dome",
-    "description": "Defend your base against endless waves of enemies",
+    "description": "Cyberpunk tower defense. Upgrade your turret, deploy powerful abilities, survive endless waves.",
     "start_url": "/",
     "display": "fullscreen",
     "orientation": "portrait",
-    "background_color": "#0a0c10",
-    "theme_color": "#4080c0",
+    "background_color": "#0a0a14",
+    "theme_color": "#00f0ff",
     "icons": [
         {
             "src": "icon-192.png",

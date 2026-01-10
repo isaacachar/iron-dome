@@ -1119,9 +1119,7 @@ class CreditDrop {
 }
 
 function spawnCreditDrop(x, y) {
-    console.log('spawnCreditDrop called, wave:', game.currentWave, 'required:', CREDIT_DROP_WAVE);
     if (game.currentWave >= CREDIT_DROP_WAVE && Math.random() < CREDIT_DROP_CHANCE) {
-        console.log('Credit drop spawned at', x, y);
         creditDrops.push(new CreditDrop(x, y));
     }
 }
@@ -1269,9 +1267,7 @@ function startWave(waveNum) {
     isSwarmWave = (waveNum % 3 === 0) && waveNum > 2 && !isBossWave;
 
     // Show credit drops notification at wave 15 (one time only)
-    console.log('Wave started:', waveNum, 'CREDIT_DROP_WAVE:', CREDIT_DROP_WAVE, 'notified:', SaveManager.data.creditDropsNotified);
     if (waveNum === CREDIT_DROP_WAVE && !SaveManager.data.creditDropsNotified) {
-        console.log('Showing credit drop notification!');
         showCreditDropNotification();
         SaveManager.data.creditDropsNotified = true;
         SaveManager.save();
@@ -2181,7 +2177,6 @@ document.getElementById('rangeBtn').addEventListener('click', () => {
         AudioManager.playUpgrade();
         game.money -= game.rangeCost;
         core.attackRange = Math.min(core.attackRange + 25, MAX_RANGE);
-        console.log('Range upgraded to:', core.attackRange);
         game.rangeCost = Math.floor(game.rangeCost * 1.6);
         upgradeLevels.range++;
         updateUpgradePanel();

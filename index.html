@@ -284,6 +284,42 @@
             animation: pulse-glow 1s infinite;
         }
 
+        .abilityBtn.pierce {
+            background: linear-gradient(180deg, rgba(0, 40, 50, 0.9) 0%, rgba(0, 20, 30, 0.95) 100%);
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        .abilityBtn.pierce:disabled {
+            background: rgba(15, 25, 30, 0.6);
+            border-color: rgba(0, 240, 255, 0.2);
+            color: var(--text-dim);
+        }
+
+        .abilityBtn.frost {
+            background: linear-gradient(180deg, rgba(20, 40, 60, 0.9) 0%, rgba(10, 25, 40, 0.95) 100%);
+            border-color: #66ccff;
+            color: #66ccff;
+        }
+
+        .abilityBtn.frost:disabled {
+            background: rgba(20, 25, 35, 0.6);
+            border-color: rgba(102, 204, 255, 0.2);
+            color: var(--text-dim);
+        }
+
+        .abilityBtn.fury {
+            background: linear-gradient(180deg, rgba(50, 45, 0, 0.9) 0%, rgba(35, 30, 0, 0.95) 100%);
+            border-color: var(--yellow);
+            color: var(--yellow);
+        }
+
+        .abilityBtn.fury:disabled {
+            background: rgba(30, 28, 15, 0.6);
+            border-color: rgba(240, 255, 0, 0.2);
+            color: var(--text-dim);
+        }
+
         .abilityBtn.nuke {
             background: linear-gradient(180deg, rgba(60, 20, 0, 0.9) 0%, rgba(40, 10, 0, 0.95) 100%);
             border-color: var(--orange);
@@ -293,6 +329,18 @@
         .abilityBtn.nuke:disabled {
             background: rgba(30, 20, 15, 0.6);
             border-color: rgba(255, 102, 0, 0.2);
+            color: var(--text-dim);
+        }
+
+        .abilityBtn.pulse {
+            background: linear-gradient(180deg, rgba(50, 0, 40, 0.9) 0%, rgba(30, 0, 25, 0.95) 100%);
+            border-color: var(--magenta);
+            color: var(--magenta);
+        }
+
+        .abilityBtn.pulse:disabled {
+            background: rgba(30, 15, 25, 0.6);
+            border-color: rgba(255, 0, 170, 0.2);
             color: var(--text-dim);
         }
 
@@ -680,6 +728,51 @@
 
         .abilityPurchaseBtn:disabled .cost {
             color: var(--text-dim);
+        }
+
+        .abilityPurchaseBtn.pierce {
+            background: linear-gradient(180deg, rgba(0, 40, 50, 0.8) 0%, rgba(0, 20, 30, 0.9) 100%);
+            border-color: var(--cyan);
+        }
+
+        .abilityPurchaseBtn.pierce .icon {
+            color: var(--cyan);
+        }
+
+        .abilityPurchaseBtn.frost {
+            background: linear-gradient(180deg, rgba(20, 40, 60, 0.8) 0%, rgba(10, 25, 40, 0.9) 100%);
+            border-color: #66ccff;
+        }
+
+        .abilityPurchaseBtn.frost .icon {
+            color: #66ccff;
+        }
+
+        .abilityPurchaseBtn.fury {
+            background: linear-gradient(180deg, rgba(50, 45, 0, 0.8) 0%, rgba(35, 30, 0, 0.9) 100%);
+            border-color: var(--yellow);
+        }
+
+        .abilityPurchaseBtn.fury .icon {
+            color: var(--yellow);
+        }
+
+        .abilityPurchaseBtn.nuke {
+            background: linear-gradient(180deg, rgba(60, 20, 0, 0.8) 0%, rgba(40, 10, 0, 0.9) 100%);
+            border-color: var(--orange);
+        }
+
+        .abilityPurchaseBtn.nuke .icon {
+            color: var(--orange);
+        }
+
+        .abilityPurchaseBtn.pulse {
+            background: linear-gradient(180deg, rgba(50, 0, 40, 0.8) 0%, rgba(30, 0, 25, 0.9) 100%);
+            border-color: var(--magenta);
+        }
+
+        .abilityPurchaseBtn.pulse .icon {
+            color: var(--magenta);
         }
 
         #closeBtn {
@@ -1117,24 +1210,24 @@
             <div id="bottomArea">
                 <!-- Ability Buttons -->
                 <div id="abilityBar">
-                    <button class="abilityBtn" id="pierceBtn" disabled>
-                        <span>PIERCE</span>
-                        <span class="count">[0]</span>
-                    </button>
-                    <button class="abilityBtn" id="frostBtn" disabled>
+                    <button class="abilityBtn frost" id="frostBtn" disabled>
                         <span>FROST</span>
                         <span class="count">[0]</span>
                     </button>
-                    <button class="abilityBtn" id="critBtn" disabled>
-                        <span>CRIT</span>
+                    <button class="abilityBtn pierce" id="pierceBtn" disabled>
+                        <span>PIERCE</span>
+                        <span class="count">[0]</span>
+                    </button>
+                    <button class="abilityBtn fury" id="furyBtn" disabled>
+                        <span>FURY</span>
+                        <span class="count">[0]</span>
+                    </button>
+                    <button class="abilityBtn pulse" id="pulseBtn" disabled>
+                        <span>PULSE</span>
                         <span class="count">[0]</span>
                     </button>
                     <button class="abilityBtn nuke" id="nukeBtn" disabled>
                         <span>NUKE</span>
-                        <span class="count">[0]</span>
-                    </button>
-                    <button class="abilityBtn" id="pulseBtn" disabled>
-                        <span>PULSE</span>
                         <span class="count">[0]</span>
                     </button>
                 </div>
@@ -1199,35 +1292,35 @@
                 <div class="upgradeSection">
                     <div class="sectionLabel">Powers</div>
                     <div class="abilityPurchaseRow">
-                        <button class="abilityPurchaseBtn" id="buyPierceBtn">
-                            <span class="icon">↯</span>
-                            <span>Pierce</span>
-                            <span class="cost">$50</span>
-                        </button>
-                        <button class="abilityPurchaseBtn" id="buyFrostBtn">
+                        <button class="abilityPurchaseBtn frost" id="buyFrostBtn">
                             <span class="icon">❄</span>
                             <span>Frost</span>
                             <span class="cost">$40</span>
                         </button>
-                        <button class="abilityPurchaseBtn" id="buyCritBtn">
+                        <button class="abilityPurchaseBtn pierce" id="buyPierceBtn">
+                            <span class="icon">↯</span>
+                            <span>Pierce</span>
+                            <span class="cost">$50</span>
+                        </button>
+                        <button class="abilityPurchaseBtn fury" id="buyFuryBtn">
                             <span class="icon">★</span>
-                            <span>Crit</span>
+                            <span>Fury</span>
                             <span class="cost">$60</span>
                         </button>
-                        <button class="abilityPurchaseBtn nuke" id="buyNukeBtn">
-                            <span class="icon">✹</span>
-                            <span>Nuke</span>
-                            <span class="cost">$500</span>
+                        <button class="abilityPurchaseBtn pulse" id="buyPulseBtn">
+                            <span class="icon">◎</span>
+                            <span>Pulse</span>
+                            <span class="cost">$120</span>
                         </button>
                         <button class="abilityPurchaseBtn shield" id="buyShieldBtn">
                             <span class="icon">♥</span>
                             <span>Life</span>
                             <span class="cost">$400</span>
                         </button>
-                        <button class="abilityPurchaseBtn" id="buyPulseBtn">
-                            <span class="icon">◎</span>
-                            <span>Pulse</span>
-                            <span class="cost">$300</span>
+                        <button class="abilityPurchaseBtn nuke" id="buyNukeBtn">
+                            <span class="icon">✹</span>
+                            <span>Nuke</span>
+                            <span class="cost">$500</span>
                         </button>
                     </div>
                 </div>

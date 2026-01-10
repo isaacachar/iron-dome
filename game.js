@@ -537,7 +537,7 @@ const game = {
     critCost: 60,
     nukeCost: 500,
     shieldCost: 400,
-    pulseCost: 300
+    pulseCost: 120
 };
 
 // ==================
@@ -1793,7 +1793,7 @@ function updateUI() {
     // Ability buttons
     updateAbilityButton('pierceBtn', core.pierceActive, core.pierceTimer, core.pierceCharges, 'PIERCE');
     updateAbilityButton('frostBtn', core.frostActive, core.frostTimer, core.frostCharges, 'FROST');
-    updateAbilityButton('critBtn', core.critActive, core.critTimer, core.critCharges, 'CRIT');
+    updateAbilityButton('furyBtn', core.critActive, core.critTimer, core.critCharges, 'FURY');
 
     // Nuke button (instant use, no timer)
     const nukeBtn = document.getElementById('nukeBtn');
@@ -1913,9 +1913,9 @@ function updateUpgradePanel() {
     frostBtn.disabled = game.money < game.frostCost;
     frostBtn.classList.toggle('affordable', game.money >= game.frostCost);
 
-    const critBtn = document.getElementById('buyCritBtn');
-    critBtn.disabled = game.money < game.critCost;
-    critBtn.classList.toggle('affordable', game.money >= game.critCost);
+    const furyBtn = document.getElementById('buyFuryBtn');
+    furyBtn.disabled = game.money < game.critCost;
+    furyBtn.classList.toggle('affordable', game.money >= game.critCost);
 
     // Nuke purchase button
     const nukeBtn = document.getElementById('buyNukeBtn');
@@ -2235,7 +2235,7 @@ document.getElementById('frostBtn').addEventListener('click', () => {
     }
 });
 
-document.getElementById('critBtn').addEventListener('click', () => {
+document.getElementById('furyBtn').addEventListener('click', () => {
     if (core.critCharges > 0 && !core.critActive) {
         AudioManager.playAbility();
         core.critCharges--;
@@ -2338,7 +2338,7 @@ document.getElementById('buyFrostBtn').addEventListener('click', () => {
     }
 });
 
-document.getElementById('buyCritBtn').addEventListener('click', () => {
+document.getElementById('buyFuryBtn').addEventListener('click', () => {
     if (game.money >= game.critCost) {
         AudioManager.playUpgrade();
         game.money -= game.critCost;

@@ -438,8 +438,7 @@ const SaveManager = {
         totalGamesPlayed: 0,
         musicEnabled: true,
         sfxEnabled: true,
-        tutorialSeen: false,
-        creditDropsNotified: false
+        tutorialSeen: false
     },
 
     data: null,
@@ -634,10 +633,6 @@ let damageNumbers = [];
 // Lives system (buyable shields)
 let lives = 0; // Start with 0, can buy up to 3
 
-// Credit drops (unlocked at wave 15)
-let creditDrops = [];
-const CREDIT_DROP_CHANCE = 0.5; // 50% chance for testing (was 15%)
-const CREDIT_DROP_WAVE = 15; // Unlocks at wave 15
 
 // ==================
 // ENEMY CLASS
@@ -664,6 +659,8 @@ class Enemy {
         this.regenRate = 0;
         this.canSplit = false;
         this.splitCount = 0;
+        this.splitTier = 0;
+        this.isMegaBoss = false;
 
         // Cyberpunk Colors
         this.bodyColor = CYBER.red;
@@ -718,6 +715,39 @@ class Enemy {
                 this.moneyReward = Math.floor(this.moneyReward * 0.7);
                 this.bodyColor = CYBER.magenta;
                 this.glowColor = '#ff44cc';
+                break;
+            case 'megaboss':
+                this.speed *= 0.3;
+                this.maxHealth *= 15;
+                this.canSplit = true;
+                this.splitCount = 3;
+                this.splitTier = 2; // 2 = splits into medium, 1 = splits into small, 0 = no split
+                this.moneyReward = Math.floor(this.moneyReward * 5);
+                this.bodyColor = '#ff4400';
+                this.glowColor = '#ff6600';
+                this.isMegaBoss = true;
+                break;
+            case 'megaboss_medium':
+                this.speed *= 0.5;
+                this.maxHealth *= 4;
+                this.canSplit = true;
+                this.splitCount = 3;
+                this.splitTier = 1;
+                this.moneyReward = Math.floor(this.moneyReward * 1.5);
+                this.bodyColor = '#ff6622';
+                this.glowColor = '#ff8844';
+                this.isMegaBoss = true;
+                break;
+            case 'megaboss_small':
+                this.speed *= 0.8;
+                this.maxHealth *= 1.5;
+                this.canSplit = false;
+                this.splitCount = 0;
+                this.splitTier = 0;
+                this.moneyReward = Math.floor(this.moneyReward * 0.5);
+                this.bodyColor = '#ff8844';
+                this.glowColor = '#ffaa66';
+                this.isMegaBoss = true;
                 break;
         }
         this.health = this.maxHealth;
@@ -809,25 +839,38 @@ class Enemy {
         AudioManager.playExplosion();
         SaveManager.addEnemyKilled();
 
-        // Chance to spawn credit drop (wave 15+)
-        spawnCreditDrop(this.x, this.y);
-
-        // Splitter spawns children
+        // Splitter/Megaboss spawns children
         if (this.canSplit && this.splitCount > 0) {
+            // Determine child type for mega boss chain
+            let childType = null;
+            if (this.isMegaBoss && this.splitTier === 2) {
+                childType = 'megaboss_medium';
+            } else if (this.isMegaBoss && this.splitTier === 1) {
+                childType = 'megaboss_small';
+            }
+
+            const spreadDist = this.isMegaBoss ? 40 : 20;
             for (let i = 0; i < this.splitCount; i++) {
-                const angle = (i / this.splitCount) * Math.PI * 2;
+                const angle = (i / this.splitCount) * Math.PI * 2 + Math.random() * 0.3;
                 const child = new Enemy(
-                    this.x + Math.cos(angle) * 20,
-                    this.y + Math.sin(angle) * 20,
+                    this.x + Math.cos(angle) * spreadDist,
+                    this.y + Math.sin(angle) * spreadDist,
                     game.currentWave
                 );
-                child.speed = this.speed * 1.5;
-                child.maxHealth = this.maxHealth * 0.3;
-                child.health = child.maxHealth;
-                child.moneyReward = Math.floor(this.moneyReward * 0.3);
-                child.bodyColor = '#ff66aa';
-                child.glowColor = CYBER.magenta;
-                child.canSplit = false;
+
+                if (childType) {
+                    // Mega boss child - use setType
+                    child.setType(childType);
+                } else {
+                    // Regular splitter child
+                    child.speed = this.speed * 1.5;
+                    child.maxHealth = this.maxHealth * 0.3;
+                    child.health = child.maxHealth;
+                    child.moneyReward = Math.floor(this.moneyReward * 0.3);
+                    child.bodyColor = '#ff66aa';
+                    child.glowColor = CYBER.magenta;
+                    child.canSplit = false;
+                }
                 child.spawnScale = 1;
                 enemies.push(child);
                 game.enemiesAlive++;
@@ -859,6 +902,9 @@ class Enemy {
         else if (this.type === 'swarm') sizeMult = 0.7;
         else if (this.type === 'regen') sizeMult = 1.3;
         else if (this.type === 'splitter') sizeMult = 1.1;
+        else if (this.type === 'megaboss') sizeMult = 3.0;
+        else if (this.type === 'megaboss_medium') sizeMult = 2.0;
+        else if (this.type === 'megaboss_small') sizeMult = 1.3;
 
         ctx.save();
         ctx.translate(this.x, this.y);
@@ -1095,95 +1141,6 @@ class Bullet {
 }
 
 // ==================
-// CREDIT DROP CLASS
-// ==================
-class CreditDrop {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.value = 25 + Math.floor(Math.random() * 26); // 25-50 credits
-        this.lifetime = 8; // Seconds before despawn
-        this.age = 0;
-        this.collected = false;
-        this.pulseTime = Math.random() * Math.PI * 2;
-        this.bobOffset = Math.random() * Math.PI * 2;
-    }
-
-    update(dt) {
-        this.age += dt;
-        this.pulseTime += dt * 4;
-        this.bobOffset += dt * 3;
-        return this.age < this.lifetime && !this.collected;
-    }
-
-    draw() {
-        const fadeStart = this.lifetime - 2;
-        let alpha = 1;
-        if (this.age > fadeStart) {
-            alpha = 1 - (this.age - fadeStart) / 2;
-        }
-
-        const pulse = Math.sin(this.pulseTime) * 0.2 + 0.8;
-        const bob = Math.sin(this.bobOffset) * 3;
-
-        ctx.save();
-        ctx.translate(this.x, this.y + bob);
-        ctx.globalAlpha = alpha;
-
-        // Outer glow
-        ctx.fillStyle = CYBER.green;
-        ctx.globalAlpha = alpha * 0.3 * pulse;
-        ctx.beginPath();
-        ctx.arc(0, 0, 14 * pulse, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Inner circle
-        ctx.globalAlpha = alpha * 0.8;
-        ctx.fillStyle = '#003311';
-        ctx.beginPath();
-        ctx.arc(0, 0, 10, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Border
-        ctx.strokeStyle = CYBER.green;
-        ctx.lineWidth = 2;
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.arc(0, 0, 10, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // $ symbol
-        ctx.fillStyle = CYBER.green;
-        ctx.font = "bold 12px 'Orbitron', sans-serif";
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('$', 0, 0);
-
-        ctx.restore();
-    }
-
-    checkCollection(tapX, tapY) {
-        const dx = tapX - this.x;
-        const dy = tapY - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 25) {
-            this.collected = true;
-            game.money += this.value;
-            AudioManager.playUpgrade();
-            spawnDamageNumber(this.x, this.y - 15, this.value, false, false);
-            return true;
-        }
-        return false;
-    }
-}
-
-function spawnCreditDrop(x, y) {
-    if (game.currentWave >= CREDIT_DROP_WAVE && Math.random() < CREDIT_DROP_CHANCE) {
-        creditDrops.push(new CreditDrop(x, y));
-    }
-}
-
-// ==================
 // DAMAGE NUMBERS
 // ==================
 function spawnDamageNumber(x, y, amount, isCrit, isBlocked) {
@@ -1293,11 +1250,8 @@ function getSpawnDelay(wave) {
 }
 
 function getMoneyReward(wave) {
-    let base = 8 + wave;
-    if (wave > 10) base = Math.floor(base * 0.6);
-    if (wave > 20) base = Math.floor(base * 0.5);
-    if (wave > 30) base = Math.floor(base * 0.4);
-    return Math.max(3, base);
+    // Simple linear scaling - no penalties
+    return 8 + wave;
 }
 
 function getAvailableTypes(wave) {
@@ -1317,30 +1271,28 @@ let spawnTimer = 0;
 let spawnDelay = 2;
 let isBossWave = false;
 let isSwarmWave = false;
+let isMegaBossWave = false;
 
 function startWave(waveNum) {
     game.currentWave = waveNum;
     game.waveInProgress = true;
 
-    isBossWave = (waveNum % 5 === 0) && waveNum > 0;
-    isSwarmWave = (waveNum % 3 === 0) && waveNum > 2 && !isBossWave;
-
-    // Show credit drops notification at wave 15 (one time only)
-    if (waveNum === CREDIT_DROP_WAVE && !SaveManager.data.creditDropsNotified) {
-        showCreditDropNotification();
-        SaveManager.data.creditDropsNotified = true;
-        SaveManager.save();
-    }
+    isMegaBossWave = (waveNum % 10 === 0) && waveNum > 0;
+    isBossWave = (waveNum % 5 === 0) && waveNum > 0 && !isMegaBossWave;
+    isSwarmWave = (waveNum % 3 === 0) && waveNum > 2 && !isBossWave && !isMegaBossWave;
 
     // Play wave start sound
-    if (isBossWave) {
+    if (isMegaBossWave || isBossWave) {
         AudioManager.playBossWarning();
     } else {
         AudioManager.playWaveStart();
     }
 
     let count = getEnemyCount(waveNum);
-    if (isSwarmWave) {
+    if (isMegaBossWave) {
+        count = 1; // Just the mega boss
+        spawnDelay = 1;
+    } else if (isSwarmWave) {
         count *= 3;
         spawnDelay = 0.15;
     } else if (isBossWave) {
@@ -1366,7 +1318,9 @@ function spawnEnemy() {
 
     // Determine type
     let type;
-    if (isSwarmWave) {
+    if (isMegaBossWave) {
+        type = 'megaboss';
+    } else if (isSwarmWave) {
         type = 'swarm';
     } else if (isBossWave) {
         type = Math.random() < 0.7 ? 'tank' : 'normal';
@@ -1892,9 +1846,12 @@ function updateAbilityButton(id, active, timer, charges, name) {
 
 function updateWaveLabel() {
     const label = document.getElementById('waveLabel');
-    label.classList.remove('boss', 'swarm');
+    label.classList.remove('boss', 'swarm', 'megaboss');
 
-    if (isBossWave) {
+    if (isMegaBossWave) {
+        label.textContent = `Wave ${game.currentWave} - MEGA BOSS`;
+        label.classList.add('megaboss');
+    } else if (isBossWave) {
         label.textContent = `Wave ${game.currentWave} - BOSS`;
         label.classList.add('boss');
     } else if (isSwarmWave) {
@@ -2106,7 +2063,7 @@ function gameLoop(currentTime) {
             game.waveInProgress = false;
             SaveManager.addWaveCompleted();
             // Celebrate boss wave completion
-            if (isBossWave) {
+            if (isBossWave || isMegaBossWave) {
                 CrazyGamesSDK.happytime();
             }
         }
@@ -2145,13 +2102,6 @@ function gameLoop(currentTime) {
 
         updateExplosions(dt);
         updateDamageNumbers(dt);
-
-        // Update credit drops
-        for (let i = creditDrops.length - 1; i >= 0; i--) {
-            if (!creditDrops[i].update(dt)) {
-                creditDrops.splice(i, 1);
-            }
-        }
     }
 
     // Ensure canvas is sized (will always have valid dimensions now)
@@ -2180,11 +2130,6 @@ function gameLoop(currentTime) {
 
     drawExplosions();
     drawDamageNumbers();
-
-    // Draw credit drops
-    for (const drop of creditDrops) {
-        drop.draw();
-    }
 
     // Draw lives indicator around core
     if (lives > 0) {
@@ -2339,7 +2284,7 @@ document.getElementById('damageBtn').addEventListener('click', () => {
         AudioManager.playUpgrade();
         game.money -= game.damageCost;
         core.damage += 10;
-        game.damageCost = Math.floor(game.damageCost * 1.8);
+        game.damageCost = Math.floor(game.damageCost * 1.4);
         upgradeLevels.damage++;
         updateUpgradePanel();
     }
@@ -2350,7 +2295,7 @@ document.getElementById('fireRateBtn').addEventListener('click', () => {
         AudioManager.playUpgrade();
         game.money -= game.fireRateCost;
         core.fireRate += 0.5;
-        game.fireRateCost = Math.floor(game.fireRateCost * 2);
+        game.fireRateCost = Math.floor(game.fireRateCost * 1.5);
         upgradeLevels.fireRate++;
         updateUpgradePanel();
     }
@@ -2361,7 +2306,7 @@ document.getElementById('rangeBtn').addEventListener('click', () => {
         AudioManager.playUpgrade();
         game.money -= game.rangeCost;
         core.attackRange = Math.min(core.attackRange + 25, MAX_RANGE);
-        game.rangeCost = Math.floor(game.rangeCost * 1.6);
+        game.rangeCost = Math.floor(game.rangeCost * 1.4);
         upgradeLevels.range++;
         updateUpgradePanel();
     }
@@ -2372,7 +2317,7 @@ document.getElementById('multishotBtn').addEventListener('click', () => {
         AudioManager.playUpgrade();
         game.money -= game.multishotCost;
         core.projectileCount++;
-        game.multishotCost = Math.floor(game.multishotCost * 2.5);
+        game.multishotCost = Math.floor(game.multishotCost * 1.8);
         upgradeLevels.multishot++;
         updateUpgradePanel();
     }
@@ -2524,7 +2469,6 @@ document.getElementById('restartBtn').addEventListener('click', () => {
     bullets = [];
     explosions = [];
     damageNumbers = [];
-    creditDrops = [];
 
     // Reset lives
     lives = 0;
@@ -2575,15 +2519,6 @@ function hideTutorial() {
     SaveManager.save();
 }
 
-function showCreditDropNotification() {
-    const notify = document.getElementById('creditDropNotify');
-    notify.classList.remove('hidden');
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
-        notify.classList.add('hidden');
-    }, 3000);
-}
-
 function startGame() {
     hideTitleScreen();
     AudioManager.init();
@@ -2616,35 +2551,6 @@ document.getElementById('tutorialBtn').addEventListener('touchend', (e) => {
     e.preventDefault();
     AudioManager.playClick();
     hideTutorial();
-});
-
-// Canvas tap handler for credit drops
-function handleCanvasTap(clientX, clientY) {
-    // Convert screen coordinates to game coordinates
-    const rect = canvas.getBoundingClientRect();
-    const screenX = clientX - rect.left;
-    const screenY = clientY - rect.top;
-
-    // Convert to game world coordinates
-    const gameX = (screenX - gameOffsetX) / gameScale;
-    const gameY = (screenY - gameOffsetY) / gameScale;
-
-    // Check credit drops
-    for (const drop of creditDrops) {
-        if (drop.checkCollection(gameX, gameY)) {
-            break;
-        }
-    }
-}
-
-canvas.addEventListener('click', (e) => {
-    handleCanvasTap(e.clientX, e.clientY);
-});
-
-canvas.addEventListener('touchstart', (e) => {
-    if (e.touches.length > 0) {
-        handleCanvasTap(e.touches[0].clientX, e.touches[0].clientY);
-    }
 });
 
 // Show title screen on load

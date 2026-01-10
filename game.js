@@ -2,6 +2,55 @@
 // ================================
 // CYBERPUNK VISUAL THEME
 
+// ==================
+// CRAZYGAMES SDK WRAPPER
+// ==================
+const CrazyGamesSDK = {
+    available: false,
+    environment: 'disabled',
+
+    async init() {
+        try {
+            if (window.CrazyGames && window.CrazyGames.SDK) {
+                this.environment = await window.CrazyGames.SDK.getEnvironment();
+                this.available = (this.environment === 'crazygames' || this.environment === 'local');
+                if (this.available) {
+                    window.CrazyGames.SDK.game.sdkGameLoadingStart();
+                }
+            }
+        } catch (e) {
+            this.available = false;
+        }
+    },
+
+    loadingStop() {
+        if (this.available) {
+            try { window.CrazyGames.SDK.game.sdkGameLoadingStop(); } catch (e) {}
+        }
+    },
+
+    gameplayStart() {
+        if (this.available) {
+            try { window.CrazyGames.SDK.game.gameplayStart(); } catch (e) {}
+        }
+    },
+
+    gameplayStop() {
+        if (this.available) {
+            try { window.CrazyGames.SDK.game.gameplayStop(); } catch (e) {}
+        }
+    },
+
+    happytime() {
+        if (this.available) {
+            try { window.CrazyGames.SDK.game.happytime(); } catch (e) {}
+        }
+    }
+};
+
+// Initialize CrazyGames SDK
+CrazyGamesSDK.init();
+
 // Cyberpunk color palette
 const CYBER = {
     cyan: '#00f0ff',
@@ -1956,9 +2005,14 @@ function showGameOver(won) {
     const isNewHighScore = SaveManager.updateHighScore(game.currentWave);
     SaveManager.addGamePlayed();
 
+    // Signal gameplay stopped to CrazyGames
+    CrazyGamesSDK.gameplayStop();
+
     if (isNewHighScore && game.currentWave > 0) {
         text.textContent = `NEW HIGH SCORE! Wave ${game.currentWave}`;
         text.style.color = '#ffcc00';
+        // Celebrate new high score
+        CrazyGamesSDK.happytime();
     } else {
         text.textContent = won ? 'VICTORY!' : 'CORE DESTROYED';
         text.style.color = won ? '#50ff80' : '#ff5050';
@@ -2051,6 +2105,10 @@ function gameLoop(currentTime) {
         if (game.enemiesAlive <= 0 && game.enemiesToSpawn <= 0 && game.waveInProgress) {
             game.waveInProgress = false;
             SaveManager.addWaveCompleted();
+            // Celebrate boss wave completion
+            if (isBossWave) {
+                CrazyGamesSDK.happytime();
+            }
         }
 
         // Auto-wave countdown (uses raw dt - unaffected by speed multiplier)
@@ -2408,6 +2466,8 @@ document.getElementById('sfxBtn').addEventListener('click', () => {
 document.getElementById('restartBtn').addEventListener('click', () => {
     AudioManager.playClick();
     AudioManager.startMusic();
+    // Signal gameplay restarted
+    CrazyGamesSDK.gameplayStart();
     // Reset game state
     game.money = 0;
     game.currentWave = 0;
@@ -2531,6 +2591,9 @@ function startGame() {
     AudioManager.startMusic();
     AudioManager.playClick();
 
+    // Signal gameplay started to CrazyGames
+    CrazyGamesSDK.gameplayStart();
+
     // Show tutorial on first play
     if (!SaveManager.data.tutorialSeen) {
         showTutorial();
@@ -2586,5 +2649,8 @@ canvas.addEventListener('touchstart', (e) => {
 
 // Show title screen on load
 showTitleScreen();
+
+// Signal that game loading is complete
+CrazyGamesSDK.loadingStop();
 
 requestAnimationFrame(gameLoop);

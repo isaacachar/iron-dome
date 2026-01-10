@@ -141,6 +141,11 @@
             text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
         }
 
+        #livesLabel {
+            color: var(--cyan);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
         #waveLabel {
             color: var(--text);
             text-shadow: 0 0 10px rgba(224, 224, 255, 0.3);
@@ -272,6 +277,18 @@
             background: linear-gradient(180deg, rgba(0, 40, 50, 0.9) 0%, rgba(0, 20, 30, 0.95) 100%);
             color: var(--cyan);
             animation: pulse-glow 1s infinite;
+        }
+
+        .abilityBtn.nuke {
+            background: linear-gradient(180deg, rgba(60, 20, 0, 0.9) 0%, rgba(40, 10, 0, 0.95) 100%);
+            border-color: var(--orange);
+            color: var(--orange);
+        }
+
+        .abilityBtn.nuke:disabled {
+            background: rgba(30, 20, 15, 0.6);
+            border-color: rgba(255, 102, 0, 0.2);
+            color: var(--text-dim);
         }
 
         @keyframes pulse-glow {
@@ -885,9 +902,104 @@
         body {
             overscroll-behavior: none;
         }
+
+        /* Tutorial Overlay */
+        #tutorialOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        #tutorialOverlay.hidden {
+            display: none;
+        }
+
+        .tutorialPanel {
+            background: linear-gradient(180deg, rgba(5, 15, 25, 0.98) 0%, rgba(10, 5, 20, 0.99) 100%);
+            border: 2px solid var(--cyan);
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: var(--glow-cyan), 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .tutorialPanel h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            color: var(--cyan);
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: var(--glow-cyan);
+            letter-spacing: 3px;
+        }
+
+        .tutorialContent {
+            margin-bottom: 20px;
+        }
+
+        .tutorialContent p {
+            color: var(--text);
+            font-size: 13px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .tutIcon {
+            color: var(--cyan);
+            font-size: 16px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        #tutorialBtn {
+            width: 100%;
+            background: linear-gradient(180deg, rgba(0, 60, 80, 0.9) 0%, rgba(0, 30, 50, 0.95) 100%);
+            border: 2px solid var(--cyan);
+            color: var(--cyan);
+            padding: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: var(--glow-cyan);
+            transition: all 0.15s;
+        }
+
+        #tutorialBtn:active {
+            background: rgba(0, 240, 255, 0.2);
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="hidden">
+        <div class="tutorialPanel">
+            <h2>HOW TO PLAY</h2>
+            <div class="tutorialContent">
+                <p><span class="tutIcon">◎</span> Enemies approach the core - destroy them automatically</p>
+                <p><span class="tutIcon">$</span> Earn money from kills to buy upgrades & powers</p>
+                <p><span class="tutIcon">⚡</span> Powers give temporary combat buffs</p>
+                <p><span class="tutIcon">♥</span> Lives save you when enemies reach the core</p>
+                <p><span class="tutIcon">✹</span> Nuke instantly destroys all enemies on screen</p>
+            </div>
+            <button id="tutorialBtn">GOT IT</button>
+        </div>
+    </div>
+
     <!-- Title Screen -->
     <div id="titleScreen">
         <div class="titleLogo">
@@ -908,6 +1020,7 @@
             <!-- Top Stats Bar -->
             <div id="topBar">
                 <span class="statBox" id="moneyLabel">$0</span>
+                <span class="statBox" id="livesLabel">♥ 0</span>
                 <span class="statBox" id="waveLabel">WAVE::00</span>
                 <span class="statBox" id="highScoreLabel">BEST::0</span>
             </div>
@@ -936,6 +1049,10 @@
                     </button>
                     <button class="abilityBtn" id="critBtn" disabled>
                         <span>CRIT</span>
+                        <span class="count">[0]</span>
+                    </button>
+                    <button class="abilityBtn nuke" id="nukeBtn" disabled>
+                        <span>NUKE</span>
                         <span class="count">[0]</span>
                     </button>
                 </div>
@@ -1014,6 +1131,16 @@
                             <span class="icon">★</span>
                             <span>Crit</span>
                             <span class="cost">$60</span>
+                        </button>
+                        <button class="abilityPurchaseBtn nuke" id="buyNukeBtn">
+                            <span class="icon">✹</span>
+                            <span>Nuke</span>
+                            <span class="cost">$500</span>
+                        </button>
+                        <button class="abilityPurchaseBtn shield" id="buyShieldBtn">
+                            <span class="icon">♥</span>
+                            <span>Life</span>
+                            <span class="cost">$400</span>
                         </button>
                     </div>
                 </div>

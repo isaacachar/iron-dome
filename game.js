@@ -881,6 +881,7 @@ const game = {
     countdown: 0,
     countdownActive: false,
     upgradeShownForWave: -1,
+    lifePauseCountdown: 0, // Countdown when life is lost (pauses game)
     lastTime: 0,
     killsThisRun: 0, // Track kills per run for scrap calculation
     scrapEarned: 0,  // Scrap earned this run (for display)
@@ -1155,6 +1156,10 @@ class Enemy {
                 AudioManager.playShieldBlock();
                 triggerShake(12); // Strong shake on taking damage
                 triggerDamageFlash(); // Red flash
+                // Pause game and show upgrade panel - gives player time to recover
+                game.paused = true;
+                game.lifePauseCountdown = 5; // 5 seconds to upgrade
+                showUpgradePanel();
                 // Kill this enemy
                 game.enemiesAlive = Math.max(0, game.enemiesAlive - 1);
                 const idx = enemies.indexOf(this);
@@ -2229,7 +2234,10 @@ function updateUI() {
 
     // Start wave button
     const startBtn = document.getElementById('startWaveBtn');
-    if (game.waveInProgress || game.enemiesAlive > 0) {
+    if (game.lifePauseCountdown > 0) {
+        startBtn.textContent = `LIFE LOST! (${Math.ceil(game.lifePauseCountdown)})`;
+        startBtn.disabled = true;
+    } else if (game.waveInProgress || game.enemiesAlive > 0) {
         startBtn.textContent = 'WAVE IN PROGRESS';
         startBtn.disabled = true;
     } else if (game.countdownActive) {
@@ -2541,6 +2549,16 @@ function gameLoop(currentTime) {
         dt = 0;
     } else {
         dt *= game.speedMultiplier;
+    }
+
+    // Life lost countdown (runs even when paused)
+    if (game.lifePauseCountdown > 0) {
+        game.lifePauseCountdown -= rawDt;
+        if (game.lifePauseCountdown <= 0) {
+            game.lifePauseCountdown = 0;
+            game.paused = false;
+            hideUpgradePanel();
+        }
     }
 
     if (!game.gameOver && !game.paused) {
@@ -3061,6 +3079,7 @@ document.getElementById('classSelectStartBtn').addEventListener('click', () => {
     game.countdown = 0;
     game.countdownActive = false;
     game.upgradeShownForWave = -1;
+    game.lifePauseCountdown = 0;
     game.killsThisRun = 0;
     game.scrapEarned = 0;
 
@@ -3291,6 +3310,25 @@ document.getElementById('tutorialBtn').addEventListener('touchend', (e) => {
     e.preventDefault();
     AudioManager.playClick();
     hideTutorial();
+});
+
+// Reset button handlers
+document.getElementById('resetBtn').addEventListener('click', () => {
+    AudioManager.playClick();
+    document.getElementById('resetModal').classList.remove('hidden');
+});
+
+document.getElementById('resetConfirmBtn').addEventListener('click', () => {
+    AudioManager.playClick();
+    localStorage.clear();
+    SaveManager.data = JSON.parse(JSON.stringify(SaveManager.defaultData));
+    document.getElementById('resetModal').classList.add('hidden');
+    showTitleScreen();
+});
+
+document.getElementById('resetCancelBtn').addEventListener('click', () => {
+    AudioManager.playClick();
+    document.getElementById('resetModal').classList.add('hidden');
 });
 
 // Show title screen on load

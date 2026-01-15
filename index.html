@@ -793,6 +793,15 @@
             color: var(--magenta);
         }
 
+        .abilityPurchaseBtn.shield {
+            background: linear-gradient(180deg, rgba(60, 20, 40, 0.8) 0%, rgba(40, 10, 25, 0.9) 100%);
+            border-color: #ff6699;
+        }
+
+        .abilityPurchaseBtn.shield .icon {
+            color: #ff6699;
+        }
+
         #closeBtn {
             margin-top: 16px;
             width: 100%;
@@ -1091,6 +1100,103 @@
         #playBtn:active {
             transform: scale(0.95);
             background: rgba(0, 240, 255, 0.2);
+        }
+
+        #resetBtn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid rgba(255, 60, 60, 0.3);
+            color: rgba(255, 100, 100, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #resetBtn:hover {
+            border-color: #ff3c3c;
+            color: #ff3c3c;
+            background: rgba(255, 60, 60, 0.1);
+        }
+
+        #resetBtn:active {
+            transform: scale(0.95);
+        }
+
+        /* Reset Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+            border: 1px solid #ff3c3c;
+            padding: 30px;
+            text-align: center;
+            max-width: 320px;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            color: #ff3c3c;
+            margin-bottom: 15px;
+        }
+
+        .modal-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            padding: 10px 25px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            background: transparent;
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s;
+        }
+
+        .modal-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
+            color: #fff;
+        }
+
+        .modal-btn.danger {
+            border-color: #ff3c3c;
+            color: #ff3c3c;
+        }
+
+        .modal-btn.danger:hover {
+            background: rgba(255, 60, 60, 0.2);
         }
 
         .titleVersion {
@@ -1491,7 +1597,20 @@
         <div id="titleUnlocks"></div>
         <div id="classSelector"></div>
         <button id="playBtn">PLAY</button>
+        <button id="resetBtn">RESET PROGRESS</button>
         <div class="titleVersion">v1.0</div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="resetModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-title">RESET ALL PROGRESS?</div>
+            <div class="modal-text">This will delete all unlocks, scrap, and high scores. This cannot be undone.</div>
+            <div class="modal-buttons">
+                <button id="resetConfirmBtn" class="modal-btn danger">RESET</button>
+                <button id="resetCancelBtn" class="modal-btn">CANCEL</button>
+            </div>
+        </div>
     </div>
 
     <div id="gameContainer">

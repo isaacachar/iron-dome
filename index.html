@@ -1126,6 +1126,33 @@
             transform: scale(0.95);
         }
 
+        #helpBtn {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            background: transparent;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            color: rgba(0, 240, 255, 0.7);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #helpBtn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        #helpBtn:active {
+            transform: scale(0.95);
+        }
+
         /* Reset Modal */
         .modal {
             position: fixed;
@@ -1574,11 +1601,13 @@
         <div class="tutorialPanel">
             <h2>HOW TO PLAY</h2>
             <div class="tutorialContent">
-                <p><span class="tutIcon">◎</span> Enemies approach the core - destroy them automatically</p>
-                <p><span class="tutIcon">$</span> Earn money from kills to buy upgrades & powers</p>
-                <p><span class="tutIcon">⚡</span> Powers: Frost slows, Pierce penetrates, Fury crits</p>
-                <p><span class="tutIcon">◎</span> Pulse creates a damaging laser ring at your range</p>
-                <p><span class="tutIcon">✹</span> Nuke instantly destroys all enemies on screen</p>
+                <p><span class="tutIcon">◎</span> Defend the core - your turret fires automatically</p>
+                <p><span class="tutIcon" style="color: var(--green);">$</span> <b style="color: var(--green);">Money</b> from kills = upgrades & powers</p>
+                <p><span class="tutIcon" style="color: var(--orange);">⬡</span> <b style="color: var(--orange);">Scrap</b> each wave = permanent unlocks</p>
+                <p><span class="tutIcon" style="color: var(--cyan);">⚡</span> <b>Upgrades</b> boost damage, fire rate, range</p>
+                <p><span class="tutIcon" style="color: var(--magenta);">★</span> <b>Powers</b> are one-time abilities</p>
+                <p><span class="tutIcon" style="color: var(--yellow);">◇</span> <b>Weapons</b> unlock with scrap</p>
+                <p style="margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); color: var(--cyan); font-size: 11px;">TIP: Tap UPGRADES between waves!</p>
             </div>
             <button id="tutorialBtn">GOT IT</button>
         </div>
@@ -1597,6 +1626,7 @@
         <div id="titleUnlocks"></div>
         <div id="classSelector"></div>
         <button id="playBtn">PLAY</button>
+        <button id="helpBtn">?</button>
         <button id="resetBtn">RESET PROGRESS</button>
         <div class="titleVersion">v1.0</div>
     </div>

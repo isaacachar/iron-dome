@@ -1,5 +1,5 @@
 // Service Worker for Iron Dome
-const CACHE_NAME = 'iron-dome-v39';
+const CACHE_NAME = 'iron-dome-v43';
 const ASSETS = [
     '/',
     '/index.html',

@@ -3312,6 +3312,12 @@ document.getElementById('tutorialBtn').addEventListener('touchend', (e) => {
     hideTutorial();
 });
 
+// Help button handler - show tutorial from title screen
+document.getElementById('helpBtn').addEventListener('click', () => {
+    AudioManager.playClick();
+    showTutorial();
+});
+
 // Reset button handlers
 document.getElementById('resetBtn').addEventListener('click', () => {
     AudioManager.playClick();
